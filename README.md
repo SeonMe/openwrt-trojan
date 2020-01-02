@@ -4,7 +4,7 @@
 
 首先自行编译 openwrt-trojan，可自行前往 [这里](http://downloads.openwrt.org/releases/) 下载对应 OpenWrt 版本的 SDK 自行编译，如何编译请自行研究，这里不赘述。
 
-如果您是 OpenWrt-19.07.0-rc2 可下载我编译好的版本：[基于 19.07.0-rc2 SDK 编译](https://seon.me/downloads/trojan_1.14.0-1_x86_64.ipk)
+如果您是 OpenWrt-19.07.0-rc2 可下载我编译好的版本：[基于 19.07.0-rc2 SDK 编译](https://github.com/SeonMe/openwrt-trojan/raw/master/file/trojan_1.14.0-1_x86_64.ipk)
 
 至于配置文件，Trojan 文档已有，这里不再赘述，安装 openwrt-trojan 后需要修改的地方有如下：
 
