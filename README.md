@@ -16,6 +16,8 @@
 
 将您的 `trojan.json` 配置文件替换 `/etc/trojan.json` 文件，请使用 A valid nat.json 部份进行修改，地址：[点这里](https://trojan-gfw.github.io/trojan/config)
 
+![](https://github.com/SeonMe/openwrt-trojan/raw/master/images/3.png)
+
 ## 2、OpenWrt
 
 首先需要解决 DNS 问题，这里使用 dnscrypt-proxy 2 作为非大陆无污染 DNS 解析方案，dnsmasq 做国内解析方案，由于 OpenWrt-19.07.0-rc2 官方库里已经有了 dnscrypt-proxy 2，故仅需要在 OpwnWrt 里安装既可。
