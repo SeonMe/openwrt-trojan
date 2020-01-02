@@ -171,7 +171,7 @@ iptables 规则可以在 OpenWrt > Network > Firewall > Custom Rules 添加，�
 
 ```
 iptables -t nat -N trojan
-iptables -t nat -A trojan -d 你的节点 IP -j RETURN
+iptables -t nat -A trojan -d 您的节点 IP -j RETURN
 iptables -t nat -A trojan -d 0.0.0.0/8 -j RETURN
 iptables -t nat -A trojan -d 10.0.0.0/8 -j RETURN
 iptables -t nat -A trojan -d 127.0.0.0/8 -j RETURN
@@ -195,7 +195,7 @@ done
 iptables -t nat -A trojan -m set --match-set chinalist dst -j RETURN
 # Add China IP
 iptables -t nat -A trojan -m set --match-set chnroute dst -j RETURN
-iptables -t nat -A trojan -p tcp -j REDIRECT --to-ports POST #你的透明代理端口
+iptables -t nat -A trojan -p tcp -j REDIRECT --to-ports POST #您的透明代理端口
 iptables -t nat -A PREROUTING -p tcp -j trojan
 
 ```
@@ -206,11 +206,11 @@ iptables -t nat -A PREROUTING -p tcp -j trojan
 
 > `# Delete & Add China IP` 部分同样是删除/添加，这里是前面 2.2.4 下载的 IP 列表，所有在这个 `chnroute ` 集里的 IP 都将全部直连，既国内 IP 不走代理。
 
-到这里你应该可以使用了，所有国内的 IP 都将采用直连的方式，国外 IP 将会全部走代理，简称国内外分流。
+到这里您应该可以使用了，所有国内的 IP 都将采用直连的方式，国外 IP 将会全部走代理，简称国内外分流。
 
 ## 3、进阶用法
 
-如果你需要更进一步，例如白名单，黑名单，gfwlist 等等，您可以接着看以下部分。
+如果您需要更进一步，例如白名单，黑名单，gfwlist 等等，您可以接着看以下部分。
 
 3.1、白名单
 
@@ -266,7 +266,7 @@ iptables -t nat -A trojan -m set --match-set blacklist src -j RETURN
 
 3.3、强制走代理
 
-例如你需要某个域名强制走代理，如 Apple 的服务等等，那么您可以在 `/etc/dnsmasq.d` 目录中添加 `proxy-domain.conf`，内容如下：
+例如您需要某个域名强制走代理，如 Apple 的服务等等，那么您可以在 `/etc/dnsmasq.d` 目录中添加 `proxy-domain.conf`，内容如下：
 
 ```
 server=/domain1/127.0.0.1#5353
