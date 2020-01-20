@@ -4,7 +4,7 @@
 
 首先自行编译 openwrt-trojan，可自行前往 [这里](http://downloads.openwrt.org/releases/) 下载对应 OpenWrt 版本的 SDK 自行编译，如何编译请自行研究，这里不赘述。
 
-如果您是 OpenWrt-19.07.0-rc2 可下载我编译好的版本：[基于 19.07.0-rc2 SDK 编译](https://github.com/SeonMe/openwrt-trojan/raw/master/file/trojan_1.14.0-1_x86_64.ipk)
+如果您是 OpenWrt-19.07.0 可下载我编译好的版本：[基于 19.07.0 SDK 编译](https://github.com/SeonMe/openwrt-trojan/raw/master/file/trojan_1.14.0-1_x86_64.ipk)
 
 至于配置文件，Trojan 文档已有，这里不再赘述，安装 openwrt-trojan 后需要修改的地方有如下：
 
@@ -20,7 +20,7 @@
 
 ## 2、OpenWrt
 
-首先需要解决 DNS 问题，这里使用 dnscrypt-proxy 2 作为非大陆无污染 DNS 解析方案，dnsmasq 做国内解析方案，由于 OpenWrt-19.07.0-rc2 官方库里已经有了 dnscrypt-proxy 2，故仅需要在 OpwnWrt 里安装既可。
+首先需要解决 DNS 问题，这里使用 dnscrypt-proxy 2 作为非大陆无污染 DNS 解析方案，dnsmasq 做国内解析方案，由于 OpenWrt-19.07.0 官方库里已经有了 dnscrypt-proxy 2，故仅需要在 OpwnWrt 里安装既可。
 
 2.1、安装 dnscrypt-proxy 等相关应用
 
@@ -307,3 +307,6 @@ ipset add lanproxylist 内网 IP/32
 iptables -t nat -A trojan -p tcp -m set --match-set lanproxylist src -j REDIRECT --to-ports POST # POST 为您的透明代理端口
 ...
 ```
+## 引用
+
+[generate_dnsmasq_chinalist.sh](https://github.com/cokebar/openwrt-scripts/raw/master/generate_dnsmasq_chinalist.sh)
