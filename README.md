@@ -101,9 +101,11 @@ cache_neg_max_ttl = 600
 
 [static]
   [static.'cloudflare']
-  stamp = 'sdns://AgcAAAAAAAAABzEuMC4wLjGgENk8mGSlIfMGXMOlIlCcKvq7AVgcrZxtjon911-ep0cg63Ul-I8NlFj4GplQGb_TTLiczclX57DvMV8Q-JdjgRgSZG5zLmNsb3VkZmxhcmUuY29tCi9kbnMtcXVlcnk'
+  stamp = 'sdns://AgcAAAAAAAAABzEuMC4wLjEgPaS3FjSkE8HO80qpbSWkAWNNTPNsOxM8dClOSOY3ASoSZG5zLmNsb3VkZmxhcmUuY29tCi9kbnMtcXVlcnk'
   [static.'google']
   stamp = 'sdns://AgUAAAAAAAAABzguOC44LjigHvYkz_9ea9O63fP92_3qVlRn43cpncfuZnUWbzAMwbkgdoAkR6AZkxo_AEMExT_cbBssN43Evo9zs5_ZyWnftEUKZG5zLmdvb2dsZQovZG5zLXF1ZXJ5'
+  [static. 'cisco']
+  stamp = 'sdns://AQAAAAAAAAAADjIwOC42Ny4yMjAuMjIwILc1EUAgbyJdPivYItf9aR6hwzzI1maNDL4Ev6vKQ_t5GzIuZG5zY3J5cHQtY2VydC5vcGVuZG5zLmNvbQ'
 ```
 
 2.1.2、重启 dnscrypt-proxy
