@@ -24,9 +24,25 @@
 
 2.1、安装 dnscrypt-proxy 等相关应用
 
+首先下载 dnsmasq-full 包到本地：[下载地址](https://downloads.openwrt.org/releases/19.07.0/packages/x86_64/base/dnsmasq-full_2.80-15_x86_64.ipk)，然后上传至 OpenWrt，您也可以直接下载到 OpenWrt 任一目录，看您方便。
+
+然后先安装 dnsmasq-full （从仓库里安装而不是下载的包）
+
+```
+opkg install dnsmasq-full
+```
+
+然后会收到报错信息，原因是文件冲突，自然的 `dnsmasq-full` 也不会安装成功，接下来要做的就是卸载 `dnsmasq` 并安装 `dnsmasq-full`
+
 ```
 opkg remove dnsmasq
-opkg install dnsmasq-full ipset dnscrypt-proxy2 coreutils-base64 ca-certificates ca-bundle curl
+opkg install dnsmasq-full*.ipk （前面下载下来的包）
+```
+
+之后再安装其他的包
+
+```
+opkg install ipset dnscrypt-proxy2 coreutils-base64 ca-certificates ca-bundle curl iptables-mod-tproxy
 ```
 
 2.1.1、配置 dnscrypt-proxy 2
