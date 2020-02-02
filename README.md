@@ -202,7 +202,7 @@ iptables -t nat -A trojan -d 224.0.0.0/4 -j RETURN
 iptables -t nat -A trojan -d 240.0.0.0/4 -j RETURN
 # Delete China Domain List
 iptables -t nat -D trojan -m set --match-set chinalist dst -j RETURN
-# Delete China
+# Delete China IP
 iptables -t nat -D trojan -m set --match-set chnroute dst -j RETURN
 ipset destroy
 ipset create chinalist hash:net
