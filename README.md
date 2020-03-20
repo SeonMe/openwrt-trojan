@@ -161,7 +161,7 @@ chmod +x generate_dnsmasq_chinalist.sh
 
 ```
 # China Domain List
-sh generate_dnsmasq_chinalist.sh -d 119.29.29.29 -p 53 -s chinalist-o /etc/dnsmasq.d/accelerated-domains.china.conf
+sh generate_dnsmasq_chinalist.sh -d 119.29.29.29 -p 53 -s chinalist -o /etc/dnsmasq.d/accelerated-domains.china.conf
 # Restart dnsmasq
 /etc/init.d/dnsmasq restart
 ```
