@@ -4,7 +4,7 @@
 
 首先自行编译 openwrt-trojan，可自行前往 [这里](http://downloads.openwrt.org/releases/) 下载对应 OpenWrt 版本的 SDK 自行编译，如何编译请自行研究，这里不赘述。
 
-如果您是 OpenWrt-19.07.0 可下载我编译好的版本：[基于 19.07.0 SDK 编译(编译时间：2020.1.21)](https://github.com/SeonMe/openwrt-trojan/raw/master/file/trojan_1.14.0-1_2020.1.21_x86_64.ipk)
+如果您是 OpenWrt-19.07.3 可下载我编译好的版本：[基于 19.07.3 SDK 编译(编译时间：2020.5.25)](https://github.com/SeonMe/openwrt-trojan/raw/master/file/trojan_1.15.1-1_x86_64.ipk)
 
 至于配置文件，Trojan 文档已有，这里不再赘述，安装 openwrt-trojan 后需要修改的地方有如下：
 
@@ -151,7 +151,7 @@ uci commit dhcp
 2.2.2、下载相应的脚本
 
 ```
-mkdir /opt/shell && cd /opt/shell
+mkdir -p /opt/shell && cd /opt/shell
 # China Domain List
 curl -L -o generate_dnsmasq_chinalist.sh https://github.com/cokebar/openwrt-scripts/raw/master/generate_dnsmasq_chinalist.sh
 chmod +x generate_dnsmasq_chinalist.sh
@@ -169,7 +169,7 @@ sh generate_dnsmasq_chinalist.sh -d 119.29.29.29 -p 53 -s chinalist -o /etc/dnsm
 2.2.4、下载中国大陆的 IP 列表
 
 ```
-mkdir /opt/chnroute
+mkdir -p /opt/chnroute
 wget -O- 'http://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest' | awk -F\| '/CN\|ipv4/ { printf("%s/%d\n", $4, 32-log($5)/log(2)) }' > /opt/chnroute/chnroute.txt
 ```
 
