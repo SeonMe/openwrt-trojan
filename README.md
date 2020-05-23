@@ -20,11 +20,11 @@
 
 ## 2、OpenWrt
 
-首先需要解决 DNS 问题，这里使用 dnscrypt-proxy 2 作为非大陆无污染 DNS 解析方案，dnsmasq 做国内解析方案，由于 OpenWrt-19.07.0 官方库里已经有了 dnscrypt-proxy 2，故仅需要在 OpwnWrt 里安装既可。
+首先需要解决 DNS 问题，这里使用 dnscrypt-proxy 2 作为非大陆无污染 DNS 解析方案，dnsmasq 做国内解析方案，由于 OpenWrt-19.07.0 版本之后官方库里已经有了 dnscrypt-proxy 2，故仅需要在 OpwnWrt 里安装既可。
 
 2.1、安装 dnscrypt-proxy 等相关应用
 
-首先下载 dnsmasq-full 包到本地：[下载地址](https://downloads.openwrt.org/releases/19.07.0/packages/x86_64/base/dnsmasq-full_2.80-15_x86_64.ipk)，然后上传至 OpenWrt，您也可以直接下载到 OpenWrt 任一目录，看您方便。
+首先下载 dnsmasq-full 包到本地：[下载地址](https://downloads.openwrt.org/releases/19.07.3/packages/x86_64/base/dnsmasq-full_2.80-16.1_x86_64.ipk)，然后上传至 OpenWrt，您也可以直接下载到 OpenWrt 任一目录，看您方便。
 
 然后先安装 dnsmasq-full （从仓库里安装而不是下载的包）
 
@@ -325,6 +325,10 @@ ipset add lanproxylist 内网 IP/32
 iptables -t nat -A trojan -p tcp -m set --match-set lanproxylist src -j REDIRECT --to-ports POST # POST 为您的透明代理端口
 ...
 ```
+## 更新
+
+2020.5.22 更新 trojan_1.15.1
+
 ## 引用
 
 [generate_dnsmasq_chinalist.sh](https://github.com/cokebar/openwrt-scripts/raw/master/generate_dnsmasq_chinalist.sh)
