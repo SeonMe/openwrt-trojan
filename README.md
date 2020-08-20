@@ -207,16 +207,17 @@ iptables -t nat -D trojan -m set --match-set chnroute dst -j RETURN
 ipset destroy
 ipset create chinalist hash:net
 ipset create chnroute hash:net
-for i in `cat /opt/chnroute/chnroute.txt`;
-do
- ipset add chnroute $i
-done
+
+ipset create proxy hash:net
+
 # Add China Domain List
-iptables -t nat -A trojan -m set --match-set chinalist dst -j RETURN
+#iptables -t nat -A trojan -m set --match-set chinalist dst -j RETURN
 # Add China IP
-iptables -t nat -A trojan -m set --match-set chnroute dst -j RETURN
-iptables -t nat -A trojan -p tcp -j REDIRECT --to-ports POST #您的透明代理端口
+#iptables -t nat -A trojan -m set --match-set chnroute dst -j RETURN
+iptables -t nat -A trojan -p tcp -m set --match-set proxy dst -j REDIRECT --to-ports POST #您的透明代理端口
+iptables -t nat -A trojan -p tcp -j RETURN # 未匹配到，直接返回
 iptables -t nat -A PREROUTING -p tcp -j trojan
+
 
 ```
 
