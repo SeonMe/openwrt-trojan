@@ -261,7 +261,7 @@ iptables -t nat -A trojan -p tcp -j RETURN
 iptables -t nat -A PREROUTING -p tcp -j trojan
 ```
 
-### 5.4、附加部分（可选）
+#### 5.4、iptables 部分附加内容（可选）
 
 请注意 iptables 规则顺序，iptables 规则是由上而下进行匹配，以下规则请阁下清楚新增在哪些位置。
 
@@ -335,7 +335,7 @@ ipset add localwhitelist IP2/32
 iptables -t nat -A trojan -m set --match-set localwhitelist src -j RETURN
 ```
 
-#### 5.4.4、内网白名单，即可以走代理的终端
+##### 5.4.4、内网白名单，即可以走代理的终端
 
 使用场景：如阁下只想自己独食，并分给某些合谋者。
 
