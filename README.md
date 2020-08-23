@@ -14,9 +14,11 @@
 
 ## 3、安装 Trojan
 
-#### 3.1、`opkg install trojan_*.ipk` （如安装失败请下载 `file` 目录下的所有文件逐个安装。）
+#### 3.1、SSH 登入 OpenWrt
 
-### 3.2、开启 Trojan
+`opkg install trojan_*.ipk` （如安装失败请下载 `file` 目录下的所有文件逐个安装。）
+
+#### 3.2、开启 Trojan
 
 将 `/etc/config/trojan` 里的 `0` 改为 `1` 既可。
 
