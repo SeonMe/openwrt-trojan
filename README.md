@@ -128,7 +128,7 @@ cache_neg_max_ttl = 600
 EOF
 ```
 
-#### 4.2.1、重启 dnscrypt-proxy 2 后完成该部分
+##### 4.2.1、重启 dnscrypt-proxy 2 后完成该部分
 
 ```
 /etc/init.d/dnscrypt-proxy restart
@@ -145,44 +145,55 @@ uci add_list dhcp.@dnsmasq[0].cachesize=10000
 uci commit dhcp
 ```
 
-##### 4.3.1、下载用于生成 `dnsmasq_chinalist` 脚本并执行操作
+##### 4.3.1、下载用于生成 `dnsmasq_chinalist` 脚本和 `gfwlist` 规则脚本
 
 ```
 mkdir -p /opt/shell && cd /opt/shell
 
+# 大陆白名单模式可用
 curl -L -o generate_dnsmasq_chinalist.sh https://github.com/cokebar/openwrt-scripts/raw/master/generate_dnsmasq_chinalist.sh
 chmod +x generate_dnsmasq_chinalist.sh
 
 sh generate_dnsmasq_chinalist.sh -d 119.29.29.29 -p 53 -s chinalist -o /etc/dnsmasq.d/accelerated-domains.china.conf
 /etc/init.d/dnsmasq restart
+
+# GfwList 强制走代理可用
+curl -L -o gfwlist2dnsmasq.sh https://github.com/cokebar/gfwlist2dnsmasq/raw/master/gfwlist2dnsmasq.sh
+chmod +x gfwlist2dnsmasq.sh
+
+sh gfwlist2dnsmasq.sh -d 127.0.0.1 -p 5353 -s gfwlist -o /etc/dnsmasq.d/dnsmasq_gfwlist.conf
 ```
 
-##### 4.3.2、下载中国大陆的 IP 列表
+##### 4.3.2、下载中国大陆的 IP 列表，大陆白名单模式可用
 
 ```
 mkdir -p /opt/chnroute
 wget -O- 'http://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest' | awk -F\| '/CN\|ipv4/ { printf("%s/%d\n", $4, 32-log($5)/log(2)) }' > /opt/chnroute/chnroute.txt
 ```
 
-2.3、登入 OpwnWrt WEB 端修改相应选项
+## 5、OpenWrt WebUI 配置
 
-登入您的 openwrt 网页端进行修改以下选项：
-
-2.3.1、DNS 转发
+#### 5.1、DNS 转发
 
 ![](https://github.com/SeonMe/openwrt-trojan/raw/master/images/1.png)
 
-2.3.2、注释解析文件
+#### 5.2、注释解析文件
 
 ![](https://github.com/SeonMe/openwrt-trojan/raw/master/images/2.png)
 
-2.4、添加 iptables 规则
+#### 5.3、iptables 规则
 
-iptables 规则可以在 OpenWrt > Network > Firewall > Custom Rules 添加，添加前请删除里面所有的内容，注意修改您的节点 IP 和 Trojan 透明代理端口。
+iptables 规则在 OpenWrt > Network > Firewall > Custom Rules 添加。
+
+添加前请删除里面所有的内容，注意修改阁下的节点 IP 和 Trojan 透明代理端口。
+
+##### 5.3.1、大陆白名单模式
 
 ```
 iptables -t nat -N trojan
-iptables -t nat -A trojan -d 您的节点 IP -j RETURN
+iptables -t nat -A trojan -d 节点 IP -j RETURN
+
+# 本地白名单部分
 iptables -t nat -A trojan -d 0.0.0.0/8 -j RETURN
 iptables -t nat -A trojan -d 10.0.0.0/8 -j RETURN
 iptables -t nat -A trojan -d 127.0.0.0/8 -j RETURN
@@ -191,41 +202,72 @@ iptables -t nat -A trojan -d 172.16.0.0/12 -j RETURN
 iptables -t nat -A trojan -d 192.168.0.0/16 -j RETURN
 iptables -t nat -A trojan -d 224.0.0.0/4 -j RETURN
 iptables -t nat -A trojan -d 240.0.0.0/4 -j RETURN
-# Delete China Domain List
+
+# 删除 ipset 集合 chinalist 的引用，即 dnsmasq_chinalist
 iptables -t nat -D trojan -m set --match-set chinalist dst -j RETURN
-# Delete China IP
+
+# 删除 ipset 集合 chnroute 的引用，即中国大陆 IP 列表
 iptables -t nat -D trojan -m set --match-set chnroute dst -j RETURN
+
+# 清空 ipset 集合并添加新的集合
 ipset destroy
 ipset create chinalist hash:net
 ipset create chnroute hash:net
+
+# 将中国大陆 IP 列表导入集合 chnroute
 for i in `cat /opt/chnroute/chnroute.txt`;
 do
  ipset add chnroute $i
 done
-# Add China Domain List
+
+# 增加 ipset 集合 chinalist 的引用，即 dnsmasq_chinalist
 iptables -t nat -A trojan -m set --match-set chinalist dst -j RETURN
-# Add China IP
+
+# 增加 ipset 集合 chnroute 的引用，即中国大陆 IP 列表
 iptables -t nat -A trojan -m set --match-set chnroute dst -j RETURN
-iptables -t nat -A trojan -p tcp -j REDIRECT --to-ports POST #您的透明代理端口
+
+iptables -t nat -A trojan -p tcp -j REDIRECT --to-ports POST #透明代理端口
+
 iptables -t nat -A PREROUTING -p tcp -j trojan
 
 ```
 
-解释：
+##### 5.3.2、gfwlist 模式
 
-> `# Delete & Add China Domain List` 部分是删除/添加前面 2.2.3 生成的文件的 IP 集，该文件主要用于国内网址并交由 `119.29.29.29` 去解析，得到的 IP 将会添加到 IP 集 `chinalist` 中，iptables 将会直连该集里的所有的 IP，顾名思义就是国内直连。
+```
+iptables -t nat -N trojan
+iptables -t nat -A trojan -d 节点 IP -j RETURN
 
-> `# Delete & Add China IP` 部分同样是删除/添加，这里是前面 2.2.4 下载的 IP 列表，所有在这个 `chnroute ` 集里的 IP 都将全部直连，既国内 IP 不走代理。
+# 本地白名单部分
+iptables -t nat -A trojan -d 0.0.0.0/8 -j RETURN
+iptables -t nat -A trojan -d 10.0.0.0/8 -j RETURN
+iptables -t nat -A trojan -d 127.0.0.0/8 -j RETURN
+iptables -t nat -A trojan -d 169.254.0.0/16 -j RETURN
+iptables -t nat -A trojan -d 172.16.0.0/12 -j RETURN
+iptables -t nat -A trojan -d 192.168.0.0/16 -j RETURN
+iptables -t nat -A trojan -d 224.0.0.0/4 -j RETURN
+iptables -t nat -A trojan -d 240.0.0.0/4 -j RETURN
 
-到这里您应该可以使用了，所有国内的 IP 都将采用直连的方式，国外 IP 将会全部走代理，简称国内外分流。
+# 删除 ipset 集合 gfwlist 的引用，即 gfwlist 规则列表
+iptables -t nat -D trojan -p tcp -m set --match-set gfwlist dst -j REDIRECT --to-ports POST #透明代理端口
 
-## 3、进阶用法
+# 清空 ipset 集合，并添加 gfwlist 集合
+ipset destroy
+ipset create gfwlist hash:net
 
-如果您需要更进一步，例如白名单，黑名单等等，您可以接着看以下部分。
+iptables -t nat -A trojan -p tcp -m set --match-set gfwlist dst -j REDIRECT --to-ports POST #透明代理端口
 
-3.1、白名单
+iptables -t nat -A trojan -p tcp -j RETURN
+iptables -t nat -A PREROUTING -p tcp -j trojan
+```
 
-顾名思义就是您不希望有一些国外的域名走代理，那么您可以在 `/etc/dnsmasq.d` 目录中添加 `whitelist.conf`，内容如下：
+### 5.4、附加部分（可选）
+
+请注意 iptables 规则顺序，iptables 规则是由上而下进行匹配，以下规则请阁下清楚新增在哪些位置。
+
+##### 5.4.1、国外白名单
+
+如果阁下不希望有一些国外的域名走代理，那么您可以在 `/etc/dnsmasq.d` 目录中添加 `whitelist.conf`，内容如下：
 
 ```
 server=/domain1/119.29.29.29#53
@@ -238,88 +280,112 @@ ipset=/domain2/whitelist
 
 ```
 ...
-# Delete China IP
-iptables -t nat -D trojan -m set --match-set chnroute dst -j RETURN
-# Delete Whitelist
 iptables -t nat -D trojan -m set --match-set whitelist dst -j RETURN
-ipset destroy
-ipset create chinalist hash:net
 ipset create whitelist hash:net
-...
-# Add China IP
-iptables -t nat -A trojan -m set --match-set chnroute dst -j RETURN
-# Add Whitelist
 iptables -t nat -A trojan -m set --match-set whitelist dst -j RETURN
 ...
 ```
 
-3.2、黑名单
+##### 5.4.2、国外黑名单
 
-这里的黑名单是指内网的黑名单，默认情况下局域网内所有的连接都将会进行国内外分流，如果您希望您的某个设备直连国内外，那么您只需要在原有的 iptables 基础上添加以下部分：
+如果阁下使用 gfwlist 模式，可参照 `/etc/dnsmasq.d/dnsmasq_gfwlist.conf` 文件格式添加对应域名既可。
 
-```
-...
-# Delete China IP
-iptables -t nat -D trojan -m set --match-set chnroute dst -j RETURN
-# Delete Blacklist
-iptables -t nat -D trojan -m set --match-set blacklist src -j RETURN
-...
-ipset create chinalist hash:net
-ipset create blacklist hash:net
-ipset add blacklist 内网 IP/32
-...
-# Add China IP
-iptables -t nat -A trojan -m set --match-set chnroute dst -j RETURN
-# Add Blacklist
-iptables -t nat -A trojan -m set --match-set blacklist src -j RETURN
-...
-```
-
-3.3、强制走代理
-
-例如您需要某个域名强制走代理，如 Apple 的服务等等，那么您可以在 `/etc/dnsmasq.d` 目录中添加 `proxy-domain.conf`，内容如下：
+否则则按照以下方式：
 
 ```
+vim /etc/dnsmasq.d/blacklist.conf
+
 server=/domain1/127.0.0.1#5353
-ipset=/domain1/proxydomain
+ipset=/domain1/blacklist
 server=/domain2/127.0.0.1#5353
-ipset=/domain2/proxydomain
+ipset=/domain2/blacklist
 ```
 
-以及在原有的 iptables 规则上修改如下：
+新增 iptables 规则
 
 ```
 ...
-iptables -t nat -A trojan -p tcp -m set --match-set proxydomain dst -j REDIRECT --to-ports POST # POST 为您的透明代理端口
+iptables -t nat -D trojan -p tcp -m set --match-set blacklist dst -j REDIRECT --to-ports POST #透明代理端口
+ipset create blacklist hash:net
+iptables -t nat -A trojan -p tcp -m set --match-set blacklist dst -j REDIRECT --to-ports POST #透明代理端口
 ...
 ```
 
-3.4、仅允许内网某些 IP 或者 IP 段走代理
+##### 5.4.3、内网黑名单，即不走代理的终端
 
-这里仅需要修改原有 iptables 规则既可，和前面 3.2 黑名单类似，修改如下：
+使用场景：PT、BT、室友、女朋友。
 
 ```
-# 仅允许某个 IP 段走代理，如 10.0.0.1/28
-iptables -t nat -A trojan -p tcp -s 10.0.0.1/28 -j REDIRECT --to-ports POST # POST 为您的透明代理端口
+...
+iptables -t nat -A trojan -s IP1/32 -j RETURN
+iptables -t nat -A trojan -s IP2/32 -j RETURN
+...
+```
 
-# 仅允许特定的内网 IP 走代理
-...
-# Delete China IP
-iptables -t nat -D trojan -m set --match-set chnroute dst -j RETURN
-# Delete Blacklist
-iptables -t nat -D trojan -m set --match-set lanproxylist src -j RETURN
-...
-ipset create chinalist hash:net
+也可以
+
+```
+iptables -t nat -D trojan -m set --match-set localwhitelist src -j RETURN
+
+ipset create localwhitelist hash:net
+
+ipset add localwhitelist IP1/32
+ipset add localwhitelist IP2/32
+
+iptables -t nat -A trojan -m set --match-set localwhitelist src -j RETURN
+```
+
+#### 5.4.4、内网白名单，即可以走代理的终端
+
+使用场景：如阁下只想自己独食，并分给某些合谋者。
+
+仅允许某个 IP 段走代理，如 10.0.0.1/28
+
+```
+# 白名单模式
+iptables -t nat -A trojan -p tcp -s 10.0.0.1/28 -j REDIRECT --to-ports POST #透明代理端口
+
+# gfwlist 模式
+iptables -t nat -A trojan -p tcp -s 10.0.0.1/28 -m set --match-set gfwlist dst -j REDIRECT --to-ports POST #透明代理端口
+```
+
+仅允许特定 IP 走代理
+
+```
+# 白名单模式
+iptables -t nat -A trojan -p tcp -s IP/32 -j REDIRECT --to-ports POST #透明代理端口
+
+或者
+
+iptables -t nat -D trojan -p tcp -m set --match-set lanproxylist src -j REDIRECT --to-ports POST #透明代理端口
+
 ipset create lanproxylist hash:net
-ipset add lanproxylist 内网 IP/32
-...
-iptables -t nat -A trojan -p tcp -m set --match-set lanproxylist src -j REDIRECT --to-ports POST # POST 为您的透明代理端口
-...
+ipset add lanproxylist IP1/32
+ipset add lanproxylist IP2/32
+
+iptables -t nat -A trojan -p tcp -m set --match-set lanproxylist src -j REDIRECT --to-ports POST #透明代理端口
+
+
+# gfwlist 模式
+iptables -t nat -D trojan -p tcp -s IP/32 -m set --match-set gfwlist dst -j REDIRECT --to-ports POST #透明代理端口
+
+或者
+
+iptables -t nat -D trojan -p tcp -m set --match-set lanproxylist src -m set --match-set gfwlist dst -j REDIRECT --to-ports POST #透明代理端口
+
+ipset create lanproxylist hash:net
+ipset add lanproxylist IP1/32
+ipset add lanproxylist IP2/32
+
+iptables -t nat -A trojan -p tcp -m set --match-set lanproxylist src -m set --match-set gfwlist dst -j REDIRECT --to-ports POST #透明代理端口
 ```
+
 ## 更新
 
+2020.8.24 新增 gfwlist 模式，并对以为不完善部分进行修改
 2020.5.22 更新 trojan_1.15.1
 
-## 引用
+## 引用脚本
 
 [generate_dnsmasq_chinalist.sh](https://github.com/cokebar/openwrt-scripts/raw/master/generate_dnsmasq_chinalist.sh)
+[gfwlist2dnsmasq.sh](https://github.com/cokebar/gfwlist2dnsmasq/raw/master/gfwlist2dnsmasq.sh)
