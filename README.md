@@ -16,7 +16,7 @@
 
 #### 3.1、SSH 登入 OpenWrt
 
-`opkg install trojan_*.ipk` （如安装失败请下载 `file` 目录下的所有文件逐个安装。）
+`opkg install trojan_*.ipk` （如安装失败请下载 [file](https://github.com/SeonMe/openwrt-trojan/tree/master/file) 目录下的所有文件逐个安装。）
 
 #### 3.2、开启 Trojan
 
@@ -37,11 +37,11 @@
 
 注：OpenWrt-19.07.0 之前仓库没有 dnscrypt-proxy 2
 
-2.1、安装 dnscrypt-proxy 等相关应用
+#### 4.1、安装 dnscrypt-proxy 等相关应用
 
-首先下载 dnsmasq-full 包到本地：[下载地址](https://downloads.openwrt.org/releases/19.07.3/packages/x86_64/base/dnsmasq-full_2.80-16.1_x86_64.ipk)，然后上传至 OpenWrt，您也可以直接下载到 OpenWrt 任一目录，看您方便。
+4.1.1、下载 [dnsmasq-full](https://downloads.openwrt.org/releases/19.07.3/packages/x86_64/base/dnsmasq-full_2.80-16.1_x86_64.ipk) 包到 OpenWrt 本地。
 
-然后先安装 dnsmasq-full （从仓库里安装而不是下载的包）
+4.1.2、安装 dnsmasq-full （从 OpenWrt 仓库里安装，不是上一步下载的。）
 
 ```
 opkg install dnsmasq-full
@@ -60,11 +60,17 @@ opkg install dnsmasq-full*.ipk （前面下载下来的包）
 opkg install ipset dnscrypt-proxy2 coreutils-base64 ca-certificates ca-bundle curl iptables-mod-tproxy
 ```
 
-2.1.1、配置 dnscrypt-proxy 2
+#### 4.2、配置 dnscrypt-proxy 2
 
-您可以修改 dnscrypt-proxy 2 的配置文件，或者使用我提供的这份，dnscrypt-proxy 2 配置文件位于 `/etc/dnscrypt-proxy2/dnscrypt-proxy.toml`，您可以删除改目录下的所有文件再新建 `dnscrypt-proxy.toml` 亦可，dnscrypt-proxy 2 仅用于解析非大陆域名，可以做到无污染。
+如阁下对 `dnscrypt-proxy 2` 了解，且可自行修改合适阁下的配置。
+
+以下是在下目前使用的配置，可直接使用。
 
 ```
+rm /etc/dnscrypt-proxy2/*
+
+cat > /etc/dnscrypt-proxy2/dnscrypt-proxy.toml << EOF
+
 listen_addresses = ['127.0.0.1:5353']
 max_clients = 250
 ipv4_servers = true
@@ -137,6 +143,7 @@ cache_neg_max_ttl = 600
   stamp = 'sdns://AgUAAAAAAAAABzguOC44LjigHvYkz_9ea9O63fP92_3qVlRn43cpncfuZnUWbzAMwbkgdoAkR6AZkxo_AEMExT_cbBssN43Evo9zs5_ZyWnftEUKZG5zLmdvb2dsZQovZG5zLXF1ZXJ5'
   [static. 'cisco']
   stamp = 'sdns://AQAAAAAAAAAADjIwOC42Ny4yMjAuMjIwILc1EUAgbyJdPivYItf9aR6hwzzI1maNDL4Ev6vKQ_t5GzIuZG5zY3J5cHQtY2VydC5vcGVuZG5zLmNvbQ'
+EOF
 ```
 
 2.1.2、重启 dnscrypt-proxy
