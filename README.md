@@ -39,9 +39,9 @@
 
 #### 4.1、安装 dnscrypt-proxy 等相关应用
 
-4.1.1、下载 [dnsmasq-full](https://downloads.openwrt.org/releases/19.07.3/packages/x86_64/base/dnsmasq-full_2.80-16.1_x86_64.ipk) 包到 OpenWrt 本地。
+##### 4.1.1、下载 [dnsmasq-full](https://downloads.openwrt.org/releases/19.07.3/packages/x86_64/base/dnsmasq-full_2.80-16.1_x86_64.ipk) 包到 OpenWrt 本地。
 
-4.1.2、安装 dnsmasq-full （从 OpenWrt 仓库里安装，不是上一步下载的。）
+##### 4.1.2、安装 dnsmasq-full （从 OpenWrt 仓库里安装，不是上一步下载的。）
 
 ```
 opkg install dnsmasq-full
@@ -62,7 +62,7 @@ opkg install ipset dnscrypt-proxy2 coreutils-base64 ca-certificates ca-bundle cu
 
 #### 4.2、配置 dnscrypt-proxy 2
 
-如阁下对 `dnscrypt-proxy 2` 了解，且可自行修改合适阁下的配置。
+如阁下对 `dnscrypt-proxy 2` 了解，请自行研究。
 
 以下是在下目前使用的配置，可直接使用。
 
@@ -103,9 +103,6 @@ log_files_max_age = 7
 log_files_max_backups = 1
 block_ipv6 = true
 
-# forwarding_rules = 'dnscrypt-forwarding-rules.txt'
-# cloaking_rules = 'dnscrypt-cloaking-rules.txt'
-
 cache = true
 cache_size = 512
 cache_min_ttl = 600
@@ -121,21 +118,6 @@ cache_neg_max_ttl = 600
   file = 'dnscrypt-nxdomain.log'
   format = 'tsv'
 
-#[blacklist]
-#  blacklist_file = 'dnscrypt-blacklist-domains.txt'
-#  log_file = 'dnscrypt-blacklist-domains.log'
-#  log_format = 'tsv'
-
-#[ip_blacklist]
-#  blacklist_file = 'dnscrypt-blacklist-ips.txt'
-#  log_file = 'dnscrypt-blacklist-ips.log'
-#  log_format = 'tsv'
-
-#[whitelist]
-#  whitelist_file = 'dnscrypt-whitelist.txt'
-#  log_file = 'dnscrypt-whitelisted.log'
-#  log_format = 'tsv'
-
 [static]
   [static.'cloudflare']
   stamp = 'sdns://AgcAAAAAAAAABzEuMC4wLjEgPaS3FjSkE8HO80qpbSWkAWNNTPNsOxM8dClOSOY3ASoSZG5zLmNsb3VkZmxhcmUuY29tCi9kbnMtcXVlcnk'
@@ -146,49 +128,36 @@ cache_neg_max_ttl = 600
 EOF
 ```
 
-2.1.2、重启 dnscrypt-proxy
+#### 4.2.1、重启 dnscrypt-proxy 2 后完成该部分
 
 ```
 /etc/init.d/dnscrypt-proxy restart
 ```
 
-2.2、配置 dnsmasq
+#### 4.3、配置 dnsmasq
 
-由于还需要使用 dnsmasq 来做国内的解析，所以需要做如下设置。
-
-新建一个目录用于存放国内域名信息的文件，给予 dnsmasq 来解析：
+新建 `dnsmasq.d` 用于存放 `dnsmasq-china-list` 或者 `gfwlist` 的文件，并开启缓存。
 
 ```
 mkdir /etc/dnsmasq.d
-```
-
-2.2.1、应用设置并添加缓存
-
-```
 uci add_list dhcp.@dnsmasq[0].confdir=/etc/dnsmasq.d
 uci add_list dhcp.@dnsmasq[0].cachesize=10000
 uci commit dhcp
 ```
 
-2.2.2、下载相应的脚本
+##### 4.3.1、下载用于生成 `dnsmasq_chinalist` 脚本并执行操作
 
 ```
 mkdir -p /opt/shell && cd /opt/shell
-# China Domain List
+
 curl -L -o generate_dnsmasq_chinalist.sh https://github.com/cokebar/openwrt-scripts/raw/master/generate_dnsmasq_chinalist.sh
 chmod +x generate_dnsmasq_chinalist.sh
-```
 
-2.2.3、生成相应的文件
-
-```
-# China Domain List
 sh generate_dnsmasq_chinalist.sh -d 119.29.29.29 -p 53 -s chinalist -o /etc/dnsmasq.d/accelerated-domains.china.conf
-# Restart dnsmasq
 /etc/init.d/dnsmasq restart
 ```
 
-2.2.4、下载中国大陆的 IP 列表
+##### 4.3.2、下载中国大陆的 IP 列表
 
 ```
 mkdir -p /opt/chnroute
