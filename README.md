@@ -24,7 +24,7 @@
 
 ### 3.3、Trojan 配置
 
-请阁下自行查阅 [Trojan Wiki](https://trojan-gfw.github.io/trojan/)，`A valid nat.json` 部分内容。
+请阁下自行查阅 [Trojan Wiki](https://trojan-gfw.github.io/trojan/config)，`A valid nat.json` 部分内容。
 
 
 ## 4、解决 DNS 污染问题
