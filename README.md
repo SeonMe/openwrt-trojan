@@ -1,4 +1,4 @@
-注意：在下仅在原版 [OpenWrt](https://github.com/openwrt/openwrt) 上进行实践，其他修改版本不保证兼容性，需要一定的 Linux 基础.
+注意：在下仅在原版 [OpenWrt-x86_64](https://github.com/openwrt/openwrt) 上进行实践，其他修改版本不保证兼容性，需要一定的 Linux 基础.
 
 ## 1、安装 Trojan 服务端
 
@@ -384,6 +384,10 @@ iptables -t nat -A trojan -p tcp -m set --match-set lanproxylist src -m set --ma
 
 2020.8.24 新增 gfwlist 模式，并对以为不完善部分进行修改
 2020.5.22 更新 trojan_1.15.1
+
+## 题外话
+
+鄙人不喜欢任何二次修改的 OpenWrt 版本，甚至有可能不再喜欢 OpenWrt，以及不喜欢使用 UI，GitHub 上这类软体都有带 luci UI 的版本，使用体验上可能对大部分人友好，但是对在下来讲还是更喜欢使用命令行和直接使用配置文件来达到目的，我的方案不适用于大部分人，我只对我自己的现实应用场景进行配置，望周知。
 
 ## 引用脚本
 
