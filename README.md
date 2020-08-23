@@ -1,26 +1,45 @@
-前提：此教程仅在原版 OpenWRT 进行实操，所有配置均基于配置文件或者命令行进行配置
+注意：在下仅在原版 [OpenWrt](https://github.com/openwrt/openwrt) 上进行实践，其他修改版本不保证兼容性，需要一定的 Linux 基础.
 
-## 1、Trojan
+## 1、安装 Trojan 服务端
 
-首先自行编译 openwrt-trojan，可自行前往 [这里](http://downloads.openwrt.org/releases/) 下载对应 OpenWrt 版本的 SDK 自行编译，如何编译请自行研究，这里不赘述。
+请阁下自行查阅 [Trojan Wiki](https://trojan-gfw.github.io/trojan/)
 
-如果您是 OpenWrt-19.07.3 可下载我编译好的版本：[基于 19.07.3 SDK 编译(编译时间：2020.5.22)](https://github.com/SeonMe/openwrt-trojan/raw/master/file/trojan_1.15.1-1_x86_64.ipk)
+## 2、编译 Trojan for OpenWrt
 
-至于配置文件，Trojan 文档已有，这里不再赘述，安装 openwrt-trojan 后需要修改的地方有如下：
+### 2.1、下载对应版本 [OpenWrt SDK](http://downloads.openwrt.org/releases/)
 
-1.1、开启 Trojan
+### 2.2、git clone [openwrt-trojan](https://github.com/trojan-gfw/openwrt-trojan)
 
-`vim /etc/config/trojan` 将 `0` 修改为 `1`，既开启 Trojan；
+### 2.3、自行研究 or 下载在下编译好的版本。[OpenWrt-19.07.3](https://github.com/SeonMe/openwrt-trojan/raw/master/file/trojan_1.15.1-1_x86_64.ipk)
 
-1.2、替换/修改 Trojan 配置
+## 3、安装 Trojan
 
-将您的 `trojan.json` 配置文件替换 `/etc/trojan.json` 文件，请使用 A valid nat.json 部份进行修改，地址：[点这里](https://trojan-gfw.github.io/trojan/config)
+### 3.1、
 
-![](https://github.com/SeonMe/openwrt-trojan/raw/master/images/3.png)
+```
+opkg install trojan_*.ipk
+```
 
-## 2、OpenWrt
+（如安装失败请下载 `file` 目录下的所有文件逐个安装。）
 
-首先需要解决 DNS 问题，这里使用 dnscrypt-proxy 2 作为非大陆无污染 DNS 解析方案，dnsmasq 做国内解析方案，由于 OpenWrt-19.07.0 版本之后官方库里已经有了 dnscrypt-proxy 2，故仅需要在 OpwnWrt 里安装既可。
+### 3.2、开启 Trojan
+
+将 `/etc/config/trojan` 里的 `0` 改为 `1` 既可。
+
+### 3.3、Trojan 配置
+
+请阁下自行查阅 [Trojan Wiki](https://trojan-gfw.github.io/trojan/)
+
+
+## 4、解决 DNS 污染问题
+
+首先这是在下使用的 DNS 解析方案：
+
+- **dnscrypt-proxy 2** ：支持 DoH 既 DNS over HTTPS，作为本地无污染上游 DNS 解析。
+- **dnsmasq-full** ：作为 dnsmasq-china-list 和 gfwlist 本地解析，前者是交给如 `119.29.29.29` 解析后直连，后者则转发给 `dnscrypt-proxy 2` 解析并代理。
+- **ipset** ：将中国大陆 IP 列表加入到 ipset 集合，匹配后直连。
+
+注：OpenWrt-19.07.0 之前仓库没有 dnscrypt-proxy 2
 
 2.1、安装 dnscrypt-proxy 等相关应用
 
