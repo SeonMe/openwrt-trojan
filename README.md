@@ -402,7 +402,7 @@ iptables -t nat -A trojan -p tcp -m set --match-set lanproxylist src -m set --ma
 
 ## 更新
 
-2020.8.24 新增 gfwlist 模式，并对以为不完善部分进行修改
+2020.8.24 新增 gfwlist 模式，并对以往不完善部分进行修改
 
 2020.5.22 更新 trojan_1.15.1
 
