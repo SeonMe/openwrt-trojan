@@ -164,7 +164,7 @@ chmod +x gfwlist2dnsmasq.sh
 sh gfwlist2dnsmasq.sh -d 127.0.0.1 -p 5353 -s gfwlist -o /etc/dnsmasq.d/dnsmasq_gfwlist.conf
 ```
 
-##### 4.3.2、下载中国大陆的 IP 列表，大陆白名单模式可用
+##### 4.3.2、下载中国大陆的 IP 列表
 
 ```
 mkdir -p /opt/chnroute
@@ -248,12 +248,32 @@ iptables -t nat -A trojan -d 192.168.0.0/16 -j RETURN
 iptables -t nat -A trojan -d 224.0.0.0/4 -j RETURN
 iptables -t nat -A trojan -d 240.0.0.0/4 -j RETURN
 
+# 删除 ipset 集合 chinalist 的引用，即 dnsmasq_chinalist
+iptables -t nat -D trojan -m set --match-set chinalist dst -j RETURN
+
+# 删除 ipset 集合 chnroute 的引用，即中国大陆 IP 列表
+iptables -t nat -D trojan -m set --match-set chnroute dst -j RETURN
+
 # 删除 ipset 集合 gfwlist 的引用，即 gfwlist 规则列表
 iptables -t nat -D trojan -p tcp -m set --match-set gfwlist dst -j REDIRECT --to-ports POST #透明代理端口
 
-# 清空 ipset 集合，并添加 gfwlist 集合
+# 清空 ipset 集合
 ipset destroy
 ipset create gfwlist hash:net
+ipset create chinalist hash:net
+ipset create chnroute hash:net
+
+# 将中国大陆 IP 列表导入集合 chnroute
+for i in `cat /opt/chnroute/chnroute.txt`;
+do
+ ipset add chnroute $i
+done
+
+# 增加 ipset 集合 chinalist 的引用，即 dnsmasq_chinalist
+iptables -t nat -A trojan -m set --match-set chinalist dst -j RETURN
+
+# 增加 ipset 集合 chnroute 的引用，即中国大陆 IP 列表
+iptables -t nat -A trojan -m set --match-set chnroute dst -j RETURN
 
 iptables -t nat -A trojan -p tcp -m set --match-set gfwlist dst -j REDIRECT --to-ports POST #透明代理端口
 
