@@ -68,9 +68,12 @@ opkg install ipset dnscrypt-proxy2 coreutils-base64 ca-certificates ca-bundle cu
 
 ```
 rm /etc/dnscrypt-proxy2/*
+vim /etc/dnscrypt-proxy2/dnscrypt-proxy.toml
+```
 
-cat > /etc/dnscrypt-proxy2/dnscrypt-proxy.toml << EOF
+配置如下：
 
+```
 listen_addresses = ['127.0.0.1:5353']
 max_clients = 250
 ipv4_servers = true
@@ -125,7 +128,6 @@ cache_neg_max_ttl = 600
   stamp = 'sdns://AgUAAAAAAAAABzguOC44LjigHvYkz_9ea9O63fP92_3qVlRn43cpncfuZnUWbzAMwbkgdoAkR6AZkxo_AEMExT_cbBssN43Evo9zs5_ZyWnftEUKZG5zLmdvb2dsZQovZG5zLXF1ZXJ5'
   [static. 'cisco']
   stamp = 'sdns://AQAAAAAAAAAADjIwOC42Ny4yMjAuMjIwILc1EUAgbyJdPivYItf9aR6hwzzI1maNDL4Ev6vKQ_t5GzIuZG5zY3J5cHQtY2VydC5vcGVuZG5zLmNvbQ'
-EOF
 ```
 
 ##### 4.2.1、重启 dnscrypt-proxy 2 后完成该部分
