@@ -10,7 +10,7 @@
 
 #### 2.2、git clone [openwrt-trojan](https://github.com/trojan-gfw/openwrt-trojan)
 
-#### 2.3、自行研究 or 下载在下编译好的版本。[基于 OpenWrt-19.07.3 版本编译的 trojan_1.15.1-1_x86_64](https://github.com/SeonMe/openwrt-trojan/raw/master/file/trojan_1.15.1-1_x86_64.ipk)
+#### 2.3、自行研究 or 下载在下编译好的版本。[基于 OpenWrt-19.07.3 版本编译的 trojan_1.16.0-1_x86_64](https://github.com/SeonMe/openwrt-trojan/raw/master/file/trojan_1.16.0-1_x86_64.ipk)
 
 ## 3、安装 Trojan
 
@@ -403,6 +403,8 @@ iptables -t nat -A trojan -p tcp -m set --match-set lanproxylist src -m set --ma
 ```
 
 ## 更新
+
+2020.9.2 更新 trojan_1.16.0-1_x86_64.ipk
 
 2020.8.24 新增 gfwlist 模式，并对以往不完善部分进行修改
 
