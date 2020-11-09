@@ -1,5 +1,7 @@
 注意：在下仅在原版 [OpenWrt-x86_64](https://github.com/openwrt/openwrt) 上进行实践，其他修改版本不保证兼容性，需要一定的 Linux 基础.
 
+## 0、将 OpenWrt 作为 ROS 的旁路由？[看这里](#)
+
 ## 1、安装 Trojan 服务端
 
 请阁下自行查阅 [Trojan Wiki](https://trojan-gfw.github.io/trojan/)
@@ -24,8 +26,7 @@
 
 ### 3.3、Trojan 配置
 
-请阁下自行查阅 [Trojan Wiki](https://trojan-gfw.github.io/trojan/config)，`A valid nat.json` 部分内容。
-
+请阁下自行查阅 [Trojan Wiki](https://trojan-gfw.github.io/trojan/config)，`A valid nat.json` 部分内容，记得将 `"local_addr": "127.0.0.1",` 改为 `"local_addr": "0.0.0.0",`。以及 `"local_port": 12345,` 为你的透明代理端口。
 
 ## 4、解决 DNS 污染问题
 
@@ -403,6 +404,8 @@ iptables -t nat -A trojan -p tcp -m set --match-set lanproxylist src -m set --ma
 ```
 
 ## 更新
+
+2020.11.9 添加旁路相关使用技巧
 
 2020.9.2 更新 trojan_1.16.0-1_x86_64.ipk
 
