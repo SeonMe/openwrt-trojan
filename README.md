@@ -1,6 +1,6 @@
 注意：在下仅在原版 [OpenWrt-x86_64](https://github.com/openwrt/openwrt) 上进行实践，其他修改版本不保证兼容性，需要一定的 Linux 基础.
 
-## 0、将 OpenWrt 作为 ROS 的旁路由？[看这里](#)
+## 0、将 OpenWrt 作为 ROS 的旁路由？[看这里](https://github.com/SeonMe/openwrt-trojan/blob/master/ROS-OW.md)
 
 ## 1、安装 Trojan 服务端
 
