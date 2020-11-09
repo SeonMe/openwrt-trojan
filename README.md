@@ -2,6 +2,8 @@
 
 ## 0、将 OpenWrt 作为 ROS 的旁路由？[看这里](https://github.com/SeonMe/openwrt-trojan/blob/master/ROS-OW.md)
 
+如果阁下对旁路玩法有兴趣，并且使用的主路由是 MikroTik RouterOS 系统（既 ROS），那么您可以多花几分钟看一看也无妨。
+
 ## 1、安装 Trojan 服务端
 
 请阁下自行查阅 [Trojan Wiki](https://trojan-gfw.github.io/trojan/)
