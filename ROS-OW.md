@@ -28,11 +28,11 @@ add address=10.0.0.x list="bypass"
 
 Bridge 是我自己本地的 LAN 名称，请修改为阁下自己的，以及 `src-address`、`dst-address` 的 IP 要改成阁下自己的内网 IP 段。
 
-注意：`dst-port` 为代理的端口，如果阁下有使用其他的服务需要开启端口，请加上！如在下使用 GCM 以及 Gmail，那么 `dst-port=443,465,587,993,995,5228,5229,5230`，阁下请根据自己的需求添加，这里不要添加 `80` 端口，下面会有到。
+注意：`dst-port` 为代理的端口，如果阁下有使用其他的服务需要开启端口，请加上！如在下使用 GCM 以及 Gmail，那么 `dst-port=443,465,587,993,995,5228,5229,5230`，阁下请根据自己的需求添加，或者选择转发所有端口 `dst-port=0-65535` 亦可。。
 
 ```
 /ip firewall mangle
-add chain=prerouting action=mark-routing new-routing-mark=oversea passthrough=no protocol=tcp src-address=10.0.0.0/24 dst-address=!10.0.0.0/24 dst-address-type=!local src-address-list=!bypass dst-address-list=!CN in-interface=Bridge dst-port=443 log=no comment="Mark Oversea Secure Connections"
+add chain=prerouting action=mark-routing new-routing-mark=oversea passthrough=no protocol=tcp src-address=10.0.0.0/24 dst-address=!10.0.0.0/24 dst-address-type=!local src-address-list=!bypass dst-address-list=!CN in-interface=Bridge dst-port=0-65535 log=no comment="Mark Oversea Secure Connections"
 ```
 ## 给标记流量指定网关
 
@@ -42,20 +42,6 @@ add chain=prerouting action=mark-routing new-routing-mark=oversea passthrough=no
 /ip route
 add gateway=10.0.0.2 check-gateway=ping distance=1 routing-mark=oversea comment="Route Oversea Secure Connections to OW"
 ```
-## 启动 yxorp-beW
-
-上门已经代理了 `443` 等端口，但是普通 `HTTP` 流量还没处理，这里就是用来处理 `80` 端口的流量的。
-
-这里我的透明代理端口是 `10999`，阁下请根据自己的端口修改。
-
-```
-/ip proxy
-set enabled=yes
-set src-address=10.0.0.1
-set port=10999
-set parent-proxy=10.0.0.2
-set parent-proxy-port=10999
-```
 
 ## 禁止外网访问代理端口
 
@@ -64,18 +50,9 @@ set parent-proxy-port=10999
 add chain=input action=drop protocol=tcp src-address=!10.0.0.0/24 dst-port=10999 log=no comment="Drop Connections from WAN"
 ```
 
-## 所以目标 80 流量端口导入本地 yxorp-beW
-
-请注意修改相关的 IP 和端口，以及 LAN 网卡名称。
-
-```
-/ip firewall nat
-add chain=dstnat action=dst-nat to-addresses=10.0.0.1 to-ports=10999 protocol=tcp src-address=10.0.0.0/24 dst-address=!10.0.0.0/24 dst-address-type=!local src-address-list=!bypass dst-address-list=!CN in-interface=Bridge dst-port=80 log=no comment="Redirect Oversea Connections to Internal Squid"
-```
-
 ## DNS 设置
 
-这里的 DNS 是网关的 IP，至于为何如此设置，请看上文关于关于解决 DNS 污染问题。并开启本机 DNS 查询服务。
+这里的 DNS 是网关的 IP，至于为何如此设置，请看上文关于关于解决 DNS 污染问题，亦可使用公共 DNS，但是效果不明显。并开启本机 DNS 查询服务。
 
 ```
 /ip dns
