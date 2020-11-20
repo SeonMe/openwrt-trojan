@@ -45,7 +45,7 @@ log=no comment="Mark Oversea TCP Secure Connections"
 ```
 ## 给标记流量指定网关
 
-这里是使用了 OpenWrt 作为旁路网管，所以网关地址为 `10.0.0.2`，请阁下根据自身实际使用情况修改。
+这里是使用了 OpenWrt 作为旁路网关，所以网关地址为 `10.0.0.2`，请阁下根据自身实际使用情况修改。
 
 ```
 /ip route
