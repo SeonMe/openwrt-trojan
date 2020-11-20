@@ -28,11 +28,20 @@ add address=10.0.0.x list="bypass"
 
 Bridge 是我自己本地的 LAN 名称，请修改为阁下自己的，以及 `src-address`、`dst-address` 的 IP 要改成阁下自己的内网 IP 段。
 
-注意：`dst-port` 为代理的端口，如果阁下有使用其他的服务需要开启端口，请加上！如在下使用 GCM 以及 Gmail，那么 `dst-port=443,465,587,993,995,5228,5229,5230`，阁下请根据自己的需求添加，或者选择转发所有端口 `dst-port=0-65535` 亦可。。
+注意：`dst-port` 为代理的端口，如果阁下有使用其他的服务需要开启端口，请加上！如在下使用 GCM 以及 Gmail，那么 `dst-port=443,465,587,993,995,5228,5229,5230`，阁下请根据自己的需求添加，或者选择转发所有端口 `dst-port=0-65535` 亦可，如需转发 `UDP` 流量，需要再添加一条，但需要修改 `protocol=udp` (需要阁下的代理支持 UDP 代理)。
 
 ```
 /ip firewall mangle
-add chain=prerouting action=mark-routing new-routing-mark=oversea passthrough=no protocol=tcp src-address=10.0.0.0/24 dst-address=!10.0.0.0/24 dst-address-type=!local src-address-list=!bypass dst-address-list=!CN in-interface=Bridge dst-port=0-65535 log=no comment="Mark Oversea Secure Connections"
+add chain=prerouting action=mark-routing new-routing-mark=oversea passthrough=no \
+protocol=tcp \
+src-address=10.0.0.0/24 \
+dst-address=!10.0.0.0/24 \
+dst-address-type=!local \
+src-address-list=!bypass \
+dst-address-list=!CN \
+in-interface=Bridge \
+dst-port=0-65535 \
+log=no comment="Mark Oversea TCP Secure Connections"
 ```
 ## 给标记流量指定网关
 
@@ -40,14 +49,18 @@ add chain=prerouting action=mark-routing new-routing-mark=oversea passthrough=no
 
 ```
 /ip route
-add gateway=10.0.0.2 check-gateway=ping distance=1 routing-mark=oversea comment="Route Oversea Secure Connections to OW"
+add gateway=10.0.0.2 \
+check-gateway=ping distance=1 routing-mark=oversea comment="Route Oversea Secure Connections to OpenWrt"
 ```
 
 ## 禁止外网访问代理端口
 
 ```
 /ip firewall filter
-add chain=input action=drop protocol=tcp src-address=!10.0.0.0/24 dst-port=10999 log=no comment="Drop Connections from WAN"
+add chain=input action=drop protocol=tcp \
+src-address=!10.0.0.0/24 \
+dst-port=10999 \
+log=no comment="Drop Connections from WAN"
 ```
 
 ## DNS 设置
